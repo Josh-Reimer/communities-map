@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        .info-panel h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .legend {
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .person { background-color: #3388ff; }
+        .church { background-color: #ff4444; }
+        .school { background-color: #44ff44; }
+        .building { background-color: #ffaa00; }
+        .congregation { background-color: #8844ff; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="info-panel">
+        <h3>Community Map</h3>
+        <div id="stats">Loading...</div>
+        <div class="legend">
+            <h4>Legend</h4>
+            <div class="legend-item">
+                <div class="legend-color person"></div>
+                <span>People</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color church"></div>
+                <span>Churches</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color school"></div>
+                <span>Schools</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color building"></div>
+                <span>Buildings</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color congregation"></div>
+                <span>Congregations</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([46.9, -116.8], 10);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Function to get marker color based on type
+        function getMarkerColor(tp) {
+            switch(tp) {
+                case '0': return '#3388ff'; // People - blue
+                case '6': return '#ff4444'; // Church - red
+                case '5': return '#44ff44'; // School - green
+                case '4': return '#ffaa00'; // Building - orange
+                default: return '#888888'; // Default - gray
+            }
+        }
+
+        // Function to get type name
+        function getTypeName(tp) {
+            switch(tp) {
+                case '0': return 'Person';
+                case '6': return 'Church';
+                case '5': return 'School';
+                case '4': return 'Building';
+                default: return 'Unknown';
+            }
+        }
+
+        // Load and display data
+        fetch('/api/data')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Loaded data:', data);
+                
+                // Update stats
+                document.getElementById('stats').innerHTML = `
+                    <strong>Total Locations:</strong> ${data.total_features}<br>
+                    <strong>Congregations:</strong> ${data.total_congregations}
+                `;
+
+                // Add regular features
+                data.features.forEach(feature => {
+                    if (feature.geometry && feature.geometry.type === 'Point') {
+                        const [lng, lat] = feature.geometry.coordinates;
+                        const props = feature.properties;
+                        
+                        const marker = L.circleMarker([lat, lng], {
+                            radius: 6,
+                            fillColor: getMarkerColor(props.tp),
+                            color: '#000',
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        });
+
+                        // Create popup content
+                        let popupContent = '<div>';
+                        if (props.f || props.l) {
+                            popupContent += `<strong>${props.f || ''} ${props.l || ''}</strong><br>`;
+                        }
+                        popupContent += `<em>Type:</em> ${getTypeName(props.tp)}<br>`;
+                        if (props.id) {
+                            popupContent += `<em>ID:</em> ${props.id}<br>`;
+                        }
+                        popupContent += `<em>Coordinates:</em> ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                        popupContent += '</div>';
+
+                        marker.bindPopup(popupContent);
+                        marker.addTo(map);
+                    }
+                });
+
+                // Add congregations with different styling
+                data.congregations.forEach(cong => {
+                    if (cong.geometry && cong.geometry.type === 'Point') {
+                        const [lng, lat] = cong.geometry.coordinates;
+                        const props = cong.properties;
+                        
+                        const marker = L.circleMarker([lat, lng], {
+                            radius: 10,
+                            fillColor: '#8844ff',
+                            color: '#000',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        });
+
+                        let popupContent = '<div>';
+                        popupContent += '<strong style="color: #8844ff;">CONGREGATION</strong><br>';
+                        if (props.f || props.l) {
+                            popupContent += `<strong>${props.f || ''} ${props.l || ''}</strong><br>`;
+                        }
+                        if (cong.source_file) {
+                            popupContent += `<em>Source:</em> ${cong.source_file}<br>`;
+                        }
+                        popupContent += `<em>Coordinates:</em> ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                        popupContent += '</div>';
+
+                        marker.bindPopup(popupContent);
+                        marker.addTo(map);
+                    }
+                });
+
+                // Fit map to bounds if we have data
+                if (data.bounds) {
+                    const bounds = L.latLngBounds(
+                        [data.bounds.south, data.bounds.west],
+                        [data.bounds.north, data.bounds.east]
+                    );
+                    map.fitBounds(bounds, { padding: [20, 20] });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading data:', error);
+                document.getElementById('stats').innerHTML = '<span style="color: red;">Error loading data</span>';
+            });
+    </script>
+</body>
+</html>
