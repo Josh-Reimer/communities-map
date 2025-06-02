@@ -1,0 +1,91 @@
+# README.md
+# Church Maps Responses Map
+
+A Flask application that displays church locations and responses on an interactive map using Leaflet.js.
+
+## Quick Start
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd churchmaps-responses-map
+   ```
+
+2. **Run with Docker:**
+   ```bash
+   # Build the image
+   docker build -t churchmaps-responses-map .
+
+   # Run the container
+   docker run -p 5000:5000 churchmaps-responses-map
+   ```
+
+3. **Access the application:**
+   Open http://localhost:5000 in your browser
+
+## Project Structure
+```
+churchmaps-responses-map/
+├── Dockerfile
+├── requirements.txt
+├── app.py
+├── .dockerignore
+├── README.md
+├── templates/
+│   └── index.html
+└── responses/
+    └── [response data files]
+```
+
+## Features
+
+- **Interactive Map**: Leaflet.js-powered map with OpenStreetMap tiles
+- **Color-coded Markers**: Different colors for different types of locations
+- **Auto-discovery**: Automatically loads all response files from the responses directory
+- **Production Ready**: Optimized for production deployment
+
+## Environment Variables
+
+- `FLASK_ENV`: Set to `production` for production deployment
+- `FLASK_APP`: Set to `app.py` (configured in Dockerfile)
+- `FLASK_RUN_HOST`: Host to bind to (default: 0.0.0.0)
+- `FLASK_RUN_PORT`: Port to bind to (default: 5000)
+
+## Development Setup
+
+If you prefer to run the application without Docker:
+
+1. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the application:**
+   ```bash
+   flask run
+   ```
+
+## Stopping the Application
+
+If running with Docker:
+```bash
+# Find the container ID
+docker ps
+
+# Stop the container
+docker stop <container-id>
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
