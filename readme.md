@@ -1,7 +1,7 @@
 # README.md
-# Church Maps Responses Map
+# Community Maps
 
-A Flask application that displays church locations and responses on an interactive map using Leaflet.js.
+A Flask application that displays church locations on an interactive map using Leaflet.js.
 
 ## Quick Start
 
@@ -81,11 +81,3 @@ docker ps
 # Stop the container
 docker stop <container-id>
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
