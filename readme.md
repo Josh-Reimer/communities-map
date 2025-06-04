@@ -1,7 +1,7 @@
 # README.md
 # Community Maps
 
-A Flask application that displays church locations on an interactive map using Leaflet.js.
+A Flask application that displays community locations on an interactive map using Leaflet.js.
 
 ## Quick Start
 
