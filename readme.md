@@ -7,17 +7,17 @@ A Flask application that displays church locations on an interactive map using L
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd churchmaps-responses-map
+   git clone https://github.com/Josh-Reimer/communities-map
+   cd communities-map
    ```
 
 2. **Run with Docker:**
    ```bash
    # Build the image
-   docker build -t churchmaps-responses-map .
+   docker build -t communities-map .
 
    # Run the container
-   docker run -p 5000:5000 churchmaps-responses-map
+   docker run -p 5000:5000 communities-map
    ```
 
 3. **Access the application:**
@@ -25,7 +25,7 @@ A Flask application that displays church locations on an interactive map using L
 
 ## Project Structure
 ```
-churchmaps-responses-map/
+communities-map/
 ├── Dockerfile
 ├── requirements.txt
 ├── app.py
@@ -33,8 +33,8 @@ churchmaps-responses-map/
 ├── README.md
 ├── templates/
 │   └── index.html
-└── responses/
-    └── [response data files]
+└── data/
+    └── [community data files]
 ```
 
 ## Features
